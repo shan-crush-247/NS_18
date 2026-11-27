@@ -1,0 +1,4 @@
+assets/WhatsApp*
+*.backup*.html
+.DS_Store
+Thumbs.db
