@@ -2134,16 +2134,6 @@
       clearTimeout(wishTimer); wishDone = true;
       shutterInto(function () { fin.classList.remove('shown', 'is-visible'); startIdle(); });
     });
-
-    // Preview hooks for testing: #t=30 renders the film at 30s; #loader shows the galaxy viewer
-    var hm = location.hash.match(/t=([\d.]+)/);
-    if (hm) {
-      loginScreen.hidden = true; loginRunning = false; journey.classList.add('is-visible', 'cinema');
-      (function pv() { renderFilm(parseFloat(hm[1]), true); endMapMove(); requestAnimationFrame(pv); })(); return;
-    }
-    if (location.hash === '#wish') { loginScreen.hidden = true; loginRunning = false; endFilm(); return; }
-    if (location.hash === '#idle') { loginScreen.hidden = true; loginRunning = false; startIdle(); return;
-    }
     otp[0].focus();
   }());
   </script>
