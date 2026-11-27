@@ -127,6 +127,7 @@
       box-shadow: 0 0 50px rgba(242,164,199,.35); opacity: 0; visibility: hidden; transition: opacity .7s, transform .7s, visibility .7s; }
     .findme.show { opacity: 1; visibility: visible; transform: translate(-50%, 0); animation: pulse-btn 1.8s infinite; }
     .findme:hover { background: linear-gradient(120deg, rgba(242,164,199,.45), rgba(187,168,250,.35)); }
+    .findme { background: linear-gradient(120deg, rgba(255,92,157,.32), rgba(190,120,255,.28)) !important; box-shadow: 0 0 40px rgba(255,92,157,.45), inset 0 0 0 1px rgba(255,255,255,.35); letter-spacing: .08em; font-weight: 600; }
     .findme .h { font-size: 20px; color: #ff8fc4; display: inline-block; animation: beat 1.1s infinite; }
     .trail { position: absolute; z-index: 17; top: calc(var(--bar) + 14px); left: 50%; transform: translateX(-50%); display: flex; gap: 7px; align-items: center; padding: 7px 15px; border-radius: 999px; background: rgba(10,8,24,.5); border: 1px solid rgba(255,255,255,.1);
       backdrop-filter: blur(10px); font-size: 11px; letter-spacing: .06em; color: #7d7898; white-space: nowrap; opacity: 0; transition: opacity .6s; pointer-events: none; }
@@ -306,7 +307,17 @@
         { src: 'memories/m21.jpg', caption: 'Warm like sunshine ☀️', emoji: '💗' },
         { src: 'memories/m22.jpg', caption: 'Two of my favourite yous', emoji: '💗' },
         { src: 'memories/m23.jpg', caption: 'Grace in white 🤍', emoji: '💗' },
-        { src: 'memories/m24.jpg', caption: 'And today… 27 · 11 🎂', emoji: '💗' }
+        { src: 'memories/m24.jpg', caption: 'My forever favourite', emoji: '💗' },
+        { src: 'memories/m25.jpg', caption: 'Soft and sweet', emoji: '💗' },
+        { src: 'memories/m26.jpg', caption: 'My cartoon queen ✨', emoji: '💗' },
+        { src: 'memories/m27.jpg', caption: 'Just you, just perfect', emoji: '💗' },
+        { src: 'memories/m28.jpg', caption: 'Sunday looked like you', emoji: '💗' },
+        { src: 'memories/m29.jpg', caption: 'Pure as white 🤍', emoji: '💗' },
+        { src: 'memories/m30.jpg', caption: 'Temple day, blessed with you 🙏', emoji: '💗' },
+        { src: 'memories/m31.jpg', caption: 'With the ones we love', emoji: '💗' },
+        { src: 'memories/m32.jpg', caption: 'Flower crown princess 🌸', emoji: '💗' },
+        { src: 'memories/m33.jpg', caption: 'The love that raised you 💐', emoji: '💗' },
+        { src: 'memories/m34.jpg', caption: 'And today… 27 · 11 🎂', emoji: '💗' }
       ],
       // ✦ Her real photo makes this scene look real: put 'girl.jpg' next to index.html.
       //   Optional: 'girl-closed.jpg' (same photo, eyes closed). 'heart' = where the arrow lands (fraction of the photo, x then y).
@@ -629,6 +640,56 @@
         [659.25, 880, 1108.73, 1318.51].forEach(function (fr, i) { var n = c.currentTime + i * .09, o = c.createOscillator(), g = c.createGain(); o.type = 'sine'; o.frequency.value = fr; g.gain.setValueAtTime(0, n); g.gain.linearRampToValueAtTime(.22, n + .01); g.gain.exponentialRampToValueAtTime(.0001, n + 2); o.connect(g); g.connect(self.master); o.start(n); o.stop(n + 2.1); });
         var n = c.currentTime, o = c.createOscillator(), g = c.createGain(); o.frequency.setValueAtTime(70, n); o.frequency.exponentialRampToValueAtTime(40, n + 1); g.gain.setValueAtTime(.5, n); g.gain.exponentialRampToValueAtTime(.0001, n + 1.2); o.connect(g); g.connect(this.master); o.start(n); o.stop(n + 1.3);
       },
+      note: function (fr, at, vol, len, dest) {
+        var c = this.ctx, o = c.createOscillator(), o2 = c.createOscillator(), g = c.createGain();
+        o.type = 'triangle'; o.frequency.value = fr; o2.type = 'sine'; o2.frequency.value = fr * 2;
+        var g2 = c.createGain(); g2.gain.value = .35;
+        g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(vol, at + .006); g.gain.exponentialRampToValueAtTime(.0001, at + (len || 1.4));
+        o.connect(g); o2.connect(g2); g2.connect(g); g.connect(dest || this.master);
+        o.start(at); o2.start(at); o.stop(at + (len || 1.4) + .05); o2.stop(at + (len || 1.4) + .05);
+      },
+      // a soft music-box melody (C – G – Am – F) for the whole journey
+      musicStart: function () {
+        if (!this.ctx || this.mus) return;
+        var c = this.ctx, self = this, bus = c.createGain(), lp = c.createBiquadFilter();
+        lp.type = 'lowpass'; lp.frequency.value = 3200; bus.gain.setValueAtTime(.0001, c.currentTime); bus.gain.linearRampToValueAtTime(.55, c.currentTime + 2.5);
+        bus.connect(lp); lp.connect(this.master);
+        var CH = [[523.25, 659.25, 783.99, 1046.5], [392, 493.88, 587.33, 783.99], [440, 523.25, 659.25, 880], [349.23, 440, 523.25, 698.46]];
+        var PAT = [0, 1, 2, 3, 2, 1, 2, 3], MEL = [1318.51, 1174.66, 1046.5, 987.77, 1046.5, 1174.66, 1318.51, 1567.98];
+        var step = .3, k = 0, next = c.currentTime + .15;
+        this.mus = { bus: bus, timer: setInterval(function () {
+          while (next < c.currentTime + 1.2) {
+            var ci = Math.floor(k / 8) % 4, ni = k % 8;
+            self.note(CH[ci][PAT[ni]], next, .09, 1.6, bus);
+            if (ni === 0) self.note(CH[ci][0] / 2, next, .07, 2.4, bus);
+            if (ni === 0 || ni === 4) self.note(MEL[(Math.floor(k / 4)) % 8], next + .02, .05, 1.8, bus);
+            next += step; k++;
+          }
+        }, 250) };
+      },
+      musicStop: function (s) {
+        if (!this.mus) return; var m = this.mus, c = this.ctx; this.mus = null;
+        m.bus.gain.cancelScheduledValues(c.currentTime); m.bus.gain.setValueAtTime(m.bus.gain.value, c.currentTime); m.bus.gain.linearRampToValueAtTime(.0001, c.currentTime + (s || 2.5));
+        setTimeout(function () { clearInterval(m.timer); }, (s || 2.5) * 1000);
+      },
+      twinkle: function () {
+        if (!this.ctx) return; var c = this.ctx, P = [1567.98, 1760, 2093, 2349.32, 2637.02, 3135.96];
+        for (var i = 0; i < 6; i++) this.note(P[(Math.random() * P.length) | 0], c.currentTime + i * .07 + Math.random() * .04, .07, 1.1);
+      },
+      harp: function () {
+        if (!this.ctx) return; var c = this.ctx, P = [523.25, 659.25, 783.99, 987.77, 1046.5, 1318.51, 1567.98, 1975.53, 2093];
+        P.forEach(function (fr, i) { this.note(fr, c.currentTime + i * .065, .1, 2.2); }, this);
+      },
+      beat: function () {
+        if (!this.ctx) return; var c = this.ctx, self = this;
+        [0, .26].forEach(function (d, i) { var n = c.currentTime + d, o = c.createOscillator(), g = c.createGain(); o.frequency.setValueAtTime(i ? 58 : 66, n); o.frequency.exponentialRampToValueAtTime(38, n + .25); g.gain.setValueAtTime(i ? .45 : .6, n); g.gain.exponentialRampToValueAtTime(.0001, n + .32); o.connect(g); g.connect(self.master); o.start(n); o.stop(n + .35); });
+      },
+      pluck: function () {
+        if (!this.ctx) return; var c = this.ctx, n = c.currentTime, o = c.createOscillator(), g = c.createGain();
+        o.type = 'triangle'; o.frequency.setValueAtTime(180, n); o.frequency.exponentialRampToValueAtTime(330, n + .5);
+        g.gain.setValueAtTime(0, n); g.gain.linearRampToValueAtTime(.12, n + .4); g.gain.exponentialRampToValueAtTime(.0001, n + .6);
+        o.connect(g); g.connect(this.master); o.start(n); o.stop(n + .65);
+      },
       toggle: function () { this.muted = !this.muted; this.fadeTo(this.level || .6, .3); }
     };
 
@@ -849,9 +910,9 @@
     }
     var LAST_ARROW = null;
     // an original chibi Cupid: curly gold hair, rosy cheeks, fluttering wings, golden bow
-    function drawCupid(ctx, B, dir, pull, t, alpha) {
+    function drawCupid(ctx, B, dir, pull, t, alpha, sOverride) {
       if (alpha <= 0) return;
-      var s = Math.min(W, H) / 760 * .8, px = -dir[1], py = dir[0];
+      var s = sOverride || Math.min(W, H) / 760 * .8, px = -dir[1], py = dir[0];
       var G = [B[0] - dir[0] * 52 * s, B[1] - dir[1] * 52 * s];
       var S = [B[0] - dir[0] * (92 + pull * 34) * s, B[1] - dir[1] * (92 + pull * 34) * s];
       var Hd = [S[0] - 26 * s, S[1] + 6 * s], C = [Hd[0] + 4 * s, Hd[1] + 54 * s], fl = Math.sin(t * 9) * .3;
@@ -927,21 +988,77 @@
       fctx.shadowColor = 'rgba(255,80,160,.95)'; fctx.shadowBlur = 18; fctx.fillStyle = '#fff4fa'; fctx.fillText(w[2], x, y);
       fctx.restore();
     }
-    function mvDrift(t) { return [Math.sin(t * .13) * 260, Math.sin(t * .09) * 140]; }
-    function sceneIdle(ctx, t) {
-      var d = mvDrift(t), tg = mvDraw(ctx, d[0], d[1], -300 + Math.sin(t * .07) * 120, t, 0);
-      if (tg) { var pu = .5 + .5 * Math.sin(t * 2.2); ctx.save(); ctx.globalCompositeOperation = 'lighter'; glow(ctx, tg.x, tg.y, tg.r * (2.1 + .25 * pu), 'rgba(255,140,200,A)', .12 + .1 * pu); ctx.restore(); }
-      var aim = cupidAim(tg ? tg.x : W / 2, tg ? tg.y : H * .3), bob = Math.sin(t * 2) * 6, B = [aim.B[0], aim.B[1] + bob], pull = .15 + .05 * Math.sin(t * 3);
-      var sc = Math.min(W, H) / 820, ap = [B[0] - aim.dir[0] * pull * 34 * Math.min(W, H) / 760 * .8, B[1] - aim.dir[1] * pull * 34 * Math.min(W, H) / 760 * .8];
-      drawCupid(ctx, B, aim.dir, pull, t, clamp(t / .8));
-      drawLoveArrow(ctx, ap[0], ap[1], Math.atan2(aim.dir[1], aim.dir[0]), sc, t, clamp(t / .8));
-      var ia = clamp((t - 1) / .8);
-      if (ia > 0) { ctx.save(); ctx.globalAlpha = ia; var fs5 = Math.round(clamp(Math.min(W, H) * .05, 24, 40)); ctx.font = '600 ' + fs5 + 'px Caveat, "Segoe Script", cursive'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.shadowColor = 'rgba(255,80,160,.95)'; ctx.shadowBlur = 18; ctx.fillStyle = '#fff4fa';
-        ctx.fillText('Cupid is ready to find the one I love…', W / 2, BAR + 70); ctx.font = '500 ' + Math.round(fs5 * .5) + 'px ' + FONT; ctx.shadowBlur = 8; ctx.fillText('tap Ready when your heart is ❤', W / 2, BAR + 70 + fs5 * .95); ctx.restore(); }
+    var INTRO = (function () {
+      var R = rng(2711), h = [], sp = [];
+      for (var i = 0; i < 46; i++) h.push({ x: R(), y: R(), s: .5 + R() * 1.1, v: .02 + R() * .05, ph: R() * TAU, c: R() < .6 ? 'rgba(255,92,157,' : R() < .5 ? 'rgba(255,170,205,' : 'rgba(255,230,240,' });
+      for (var j = 0; j < 90; j++) sp.push({ x: R(), y: R(), s: .6 + R() * 1.8, ph: R() * TAU, f: 1 + R() * 2.5 });
+      return { hearts: h, spark: sp, launch: -1, started: false };
+    })();
+    function sceneIntro(ctx, t) {
+      var m = Math.min(W, H), lt = INTRO.launch >= 0 ? t - INTRO.launch : -1;
+      ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+      var Mul = Math.min(2.1, H * .58 / (290 * m / 760 * .8)), s = m / 760 * .8 * Mul;
+      var cx = W / 2, cy = H * .5 + Math.sin(t * 1.6) * 9 * s;
+      // halo + slowly turning light rays
+      var hg = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * .6);
+      hg.addColorStop(0, 'rgba(120,20,70,.55)'); hg.addColorStop(.35, 'rgba(60,8,40,.35)'); hg.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = hg; ctx.fillRect(0, 0, W, H);
+      ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.translate(cx, cy); ctx.rotate(t * .05);
+      for (var r = 0; r < 14; r++) {
+        ctx.rotate(TAU / 14); var L = Math.max(W, H);
+        var rg = ctx.createLinearGradient(0, 0, L, 0); rg.addColorStop(0, 'rgba(255,140,200,.10)'); rg.addColorStop(1, 'rgba(255,140,200,0)');
+        ctx.fillStyle = rg; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(L, -L * .06); ctx.lineTo(L, L * .06); ctx.closePath(); ctx.fill();
+      }
+      ctx.restore();
+      // sparkles
+      ctx.save(); ctx.globalCompositeOperation = 'lighter';
+      INTRO.spark.forEach(function (p) { var a = .25 + .75 * Math.pow(.5 + .5 * Math.sin(t * p.f + p.ph), 3); ctx.globalAlpha = a * .9; ctx.drawImage(SPR.white, p.x * W - p.s * 4, p.y * H - p.s * 4, p.s * 8, p.s * 8); });
+      ctx.restore(); ctx.globalAlpha = 1;
+      // hearts rising softly
+      INTRO.hearts.forEach(function (p) {
+        var y = ((p.y - t * p.v) % 1 + 1) % 1, x = p.x + Math.sin(t * .5 + p.ph) * .02, a = Math.sin(y * PI) * .55;
+        ctx.fillStyle = p.c + a + ')'; heartShape(ctx, x * W, y * H, 13 * p.s * m / 760, Math.sin(t + p.ph) * .3); ctx.fill();
+      });
+      // Cupid with his bow aimed at the sky
+      var dir = [Math.sin(t * .7) * .06, -1]; var dl = Math.hypot(dir[0], dir[1]); dir = [dir[0] / dl, dir[1] / dl];
+      var B = [cx + 22 * s, cy - 70 * s], pull = .15 + .05 * Math.sin(t * 3), rel = .6, ar = null;
+      if (lt >= 0) {
+        if (lt < rel) pull = lerp(.2, 1, ease(lt / rel));
+        else pull = Math.max(0, Math.sin((lt - rel) * 40) * .3 * Math.exp(-(lt - rel) * 6));
+      }
+      ctx.save(); ctx.globalCompositeOperation = 'lighter'; glow(ctx, cx, cy, 260 * s, 'rgba(255,120,190,A)', .35 + .15 * Math.sin(t * 2)); ctx.restore();
+      drawCupid(ctx, B, dir, pull, t, 1, s);
+      var sc = s * 1.16, ang = Math.atan2(dir[1], dir[0]);
+      if (lt < rel) { ar = [B[0] - dir[0] * pull * 34 * s, B[1] - dir[1] * pull * 34 * s]; drawLoveArrow(ctx, ar[0], ar[1], ang, sc, t, 1); }
+      else {
+        var q = lt - rel, d = q * q * 5200 * s + q * 400 * s; ar = [B[0] + dir[0] * d, B[1] + dir[1] * d];
+        ctx.save(); ctx.globalCompositeOperation = 'lighter';
+        for (var k = 0; k < 14; k++) { var tq = Math.max(0, q - k * .02), td = tq * tq * 5200 * s + tq * 400 * s; ctx.globalAlpha = (1 - k / 14) * .8; ctx.drawImage(SPR.pink, B[0] + dir[0] * td - 30 * s, B[1] + dir[1] * td - 30 * s, 60 * s, 60 * s); }
+        ctx.restore(); ctx.globalAlpha = 1;
+        drawLoveArrow(ctx, ar[0], ar[1], ang, sc, t, 1);
+      }
+      // title
+      var ta = clamp((t - .4) / 1.2) * (lt >= 0 ? 1 - clamp(lt / .4) : 1);
+      if (ta > 0) {
+        ctx.save(); ctx.globalAlpha = ta; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        var fs6 = Math.round(clamp(m * .085, 34, 68));
+        ctx.font = 'italic 500 ' + fs6 + 'px ' + SERIF; ctx.shadowColor = 'rgba(255,90,170,.9)'; ctx.shadowBlur = 28;
+        var tg = ctx.createLinearGradient(W / 2 - fs6 * 4, 0, W / 2 + fs6 * 4, 0); tg.addColorStop(0, '#ffd1e6'); tg.addColorStop(.5, '#ffffff'); tg.addColorStop(1, '#ffc0dc');
+        ctx.fillStyle = tg; ctx.fillText('Cupid is ready', W / 2, Math.max(BAR + fs6 * .9, cy - 250 * s));
+        ctx.shadowBlur = 10; ctx.font = '500 ' + Math.round(fs6 * .3) + 'px ' + FONT; ctx.fillStyle = 'rgba(255,214,232,.9)';
+        ctx.fillText('one arrow · one heart · one forever', W / 2, Math.max(BAR + fs6 * .9, cy - 250 * s) + fs6 * .78);
+        ctx.restore();
+      }
+      // bloom into the journey
+      if (lt > .85) { var fl = clamp((lt - .85) / .3); ctx.fillStyle = 'rgba(255,225,240,' + fl + ')'; ctx.fillRect(0, 0, W, H); }
+      if (lt > 1.15 && !INTRO.started) { INTRO.started = true; setTimeout(startFilm, 0); }
     }
+    function mvDrift(t) { return [Math.sin(t * .13) * 260, Math.sin(t * .09) * 140]; }
+    function sceneIdle(ctx, t) { sceneIntro(ctx, t); }
     function sceneMultiverse(ctx, p, t) {
       var k0 = 1 - smooth(seg(p, 0, .35)), cz = lerp(-300, MV_T.p[2] - 60, Math.pow(ease(seg(p, .05, 1)), 1.6));
       var tg = mvDraw(ctx, MV_D0[0] * k0, MV_D0[1] * k0, cz, t + IDLE_T, smooth(seg(p, .15, .4)));
+      var bl = 1 - seg(GT, 0, .7); if (bl > 0) { ctx.fillStyle = 'rgba(255,225,240,' + bl + ')'; ctx.fillRect(0, 0, W, H); }
       var la = seg(p, .02, .1) * (1 - seg(p, .3, .38));
       if (la > 0) { ctx.globalAlpha = la; hudText(ctx, W / 2, BAR + 92, 'THE MULTIVERSE', 14, '#e9ddff', 'center', 800); hudText(ctx, W / 2, BAR + 112, 'infinite universes, one heart to find', 11, '#d9cdf5', 'center', 500); ctx.globalAlpha = 1; }
       if (tg) {
@@ -952,20 +1069,11 @@
           ctx.globalAlpha = ba; var ty = Math.max(BAR + 76, tg.y - bs / 2 - 34);
           hudText(ctx, tg.x, ty, 'OUR UNIVERSE', 14, '#ffd2e6', 'center', 800); hudText(ctx, tg.x, ty + 19, 'the one where you exist', 11, '#ffe9f3', 'center', 500); ctx.globalAlpha = 1;
         }
-        var rel = .45;
-        if (GT < 2.4) {
-          var aim = cupidAim(tg.x, tg.y), m7 = Math.min(W, H) / 760 * .8;
-          var pull = GT < rel ? lerp(.2, 1, ease(GT / rel)) : Math.max(0, Math.sin((GT - rel) * 40) * .25 * Math.exp(-(GT - rel) * 6));
-          var cy0 = (GT > 1.1 ? Math.pow(GT - 1.1, 2) * 120 : 0);
-          drawCupid(ctx, [aim.B[0] - (GT > 1.1 ? (GT - 1.1) * 60 : 0), aim.B[1] + cy0], aim.dir, pull, t + IDLE_T, 1 - seg(GT, 1.1, 2.3));
-        }
-        if (GT < rel) {
-          var ap = [aim.B[0] - aim.dir[0] * pull * 34 * m7, aim.B[1] - aim.dir[1] * pull * 34 * m7];
-          drawLoveArrow(ctx, ap[0], ap[1], Math.atan2(aim.dir[1], aim.dir[0]), Math.min(W, H) / 820, GT, 1);
+        var rel = 0;
+        if (GT < -1) {
         } else if (GT < 1.3) {
-          var aim2 = cupidAim(tg.x, tg.y), l2 = leadPos(GT), q2 = (GT - rel) / (1.3 - rel), surge = Math.sin(q2 * PI) * 70 * Math.min(W, H) / 760;
-          var a2 = lerpAng(Math.atan2(aim2.dir[1], aim2.dir[0]), Math.atan2(tg.y - l2[1], tg.x - l2[0]), smooth(q2));
-          drawLoveArrow(ctx, lerp(aim2.B[0], l2[0], smooth(q2)) + Math.cos(a2) * surge, lerp(aim2.B[1], l2[1], smooth(q2)) + Math.sin(a2) * surge, a2, Math.min(W, H) / 820, GT, 1);
+          var l2 = leadPos(GT), q2 = GT / 1.3, a2 = Math.atan2(tg.y - l2[1], tg.x - l2[0]), rise = (1 - easeOut(q2)) * H * .55;
+          drawLoveArrow(ctx, l2[0], l2[1] + rise, lerpAng(-PI / 2, a2, smooth(q2)), Math.min(W, H) / 820, GT, 1);
         } else arrowLead(ctx, tg.x, tg.y, t, 1);
         var mem = seg(p, .8, 1);
         if (mem > 0) {
@@ -1942,7 +2050,7 @@
     var NEURO = (function () {
       var R = rng(77), n = [], c = [];
       for (var i = 0; i < 190; i++) {
-        var x = (R() - .5) * 1500, y = (R() - .5) * 950, z = R() * (CONFIG.memories.length * 310 + 900) - 200;
+        var x = (R() - .5) * 1500, y = (R() - .5) * 950, z = R() * (CONFIG.memories.length * 265 + 900) - 200;
         var d = Math.hypot(x / 1.3, y); if (d < 170) { var k = 170 / Math.max(d, 1); x *= k; y *= k; }
         n.push({ p: [x, y, z], s: .6 + R() * .9, col: R() < .7 ? 'pink' : 'violet' });
       }
@@ -1955,7 +2063,7 @@
       });
       return { n: n, c: c };
     })();
-    var MEMN = CONFIG.memories.map(function (m, i) { var a = i * 2.39996, r = 200 + (i % 3) * 30; return { p: [Math.cos(a) * r * 1.3, Math.sin(a) * r * .7, 500 + i * 310] }; });
+    var MEMN = CONFIG.memories.map(function (m, i) { var a = i * 2.39996, r = 200 + (i % 3) * 30; return { p: [Math.cos(a) * r * 1.3, Math.sin(a) * r * .7, 500 + i * 265] }; });
     MEMN.forEach(function (mn) { mn.links = NEURO.n.map(function (b, j) { return { j: j, d: Math.hypot(mn.p[0] - b.p[0], mn.p[1] - b.p[1], mn.p[2] - b.p[2]) }; }).sort(function (u, v) { return u.d - v.d; }).slice(0, 4); });
     function sceneMind(ctx, p, t) {
       var last = MEMN[MEMN.length - 1].p[2], camz = lerp(-350, last - 240, ease(p) * .25 + p * .75);
@@ -2032,7 +2140,7 @@
       { dur: 4.8, draw: sceneEarth },
       { dur: 8.7, draw: sceneMap },
       { dur: 8.5, draw: sceneGirl },
-      { dur: 19, draw: sceneMind }
+      { dur: 25, draw: sceneMind }
     ];
     var MAPI = 4, IX = { solar: 2, earth: 3, map: 4, girl: 5, mem: 6 };
     var CHAPTERS = [
@@ -2048,7 +2156,9 @@
     (function () { var acc = 0; SCENES.forEach(function (s) { STARTS.push(acc); acc += s.dur - OVER; }); TOTAL = STARTS[STARTS.length - 1] + SCENES[SCENES.length - 1].dur; })();
     var CRUMBS = [0, STARTS[1], STARTS[1] + SCENES[1].dur * .42, STARTS[2], STARTS[2] + SCENES[2].dur * .45, STARTS[3] + SCENES[3].dur * .6, STARTS[4] + SCENES[4].dur * .22, STARTS[4] + SCENES[4].dur * .5, STARTS[5] + .5];
     var EVENTS = [
-      { at: .45, fn: 'whoosh' }, { at: STARTS[1] - .5, fn: 'boom' }, { at: STARTS[2] - .4, fn: 'whoosh' }, { at: STARTS[3] - .3, fn: 'whoosh' }, { at: STARTS[4] - .2, fn: 'whoosh' }, { at: STARTS[5] - .3, fn: 'whoosh' },
+      { at: .2, fn: 'twinkle' }, { at: STARTS[1] - .5, fn: 'boom' }, { at: STARTS[1] + .3, fn: 'twinkle' }, { at: STARTS[2] + .2, fn: 'harp' }, { at: STARTS[3] + .2, fn: 'twinkle' }, { at: STARTS[3] + 1.6, fn: 'harp' },
+      { at: STARTS[4] + SCENES[4].dur * .3, fn: 'twinkle' }, { at: STARTS[4] + SCENES[4].dur * .55, fn: 'beat' }, { at: STARTS[4] + SCENES[4].dur * .66, fn: 'beat' }, { at: STARTS[4] + SCENES[4].dur * .76, fn: 'beat' }, { at: STARTS[4] + SCENES[4].dur * .84, fn: 'beat' },
+      { at: STARTS[5] + 1.0, fn: 'twinkle' }, { at: STARTS[5] + 5.5, fn: 'harp' }, { at: STARTS[6] + .4, fn: 'harp' }, { at: STARTS[6] + 6, fn: 'twinkle' }, { at: STARTS[6] + 12, fn: 'twinkle' }, { at: STARTS[6] + 18, fn: 'twinkle' }, { at: STARTS[2] - .4, fn: 'whoosh' }, { at: STARTS[3] - .3, fn: 'whoosh' }, { at: STARTS[4] - .2, fn: 'whoosh' }, { at: STARTS[5] - .3, fn: 'whoosh' },
       { at: STARTS[5] + 2.0, fn: 'heart' }, { at: STARTS[6] + .2, fn: 'whoosh' }
     ];
     var filmT = 0, playing = false, idle = false, idleT = 0, lastNow = 0, fired = {}, capIdx = -1, crumbIdx = -1;
@@ -2095,7 +2205,6 @@
       if (show !== capIdx) { capIdx = show; if (!quiet) setChapter(show); }
       setCrumb(T);
       progressBar.style.width = (clamp(T / TOTAL) * 100) + '%';
-      arrowWords(T);
     }
     function filmFrame(now) {
       if (!playing) return;
@@ -2125,14 +2234,15 @@
       Sound.fadeTo(.5, 2);
     }
     findBtn.addEventListener('click', function () {
-      if (!idle) return;
-      idle = false; findBtn.classList.remove('show'); subtitle.classList.remove('show');
-      IDLE_T = idleT; MV_D0 = mvDrift(idleT);
+      if (!idle || INTRO.launch >= 0) return;
+      findBtn.classList.remove('show'); subtitle.classList.remove('show');
+      INTRO.launch = idleT; INTRO.started = false; IDLE_T = idleT; MV_D0 = [0, 0];
+      Sound.pluck(); setTimeout(function () { Sound.whoosh(); Sound.twinkle(); }, 600); Sound.musicStart();
       try { var vp2 = VID.el.play(); if (vp2 && vp2.then) vp2.then(function () { VID.el.pause(); VID.el.currentTime = 0; }, function () { }); } catch (e) { }
-      Sound.chime();
-      startFilm();
+
     });
     function startFilm() {
+      idle = false; INTRO.launch = -1;
       filmT = 0; fired = {}; capIdx = -1; crumbIdx = -1; playing = true;
       journey.classList.add('is-visible', 'cinema');
       renderFilm(0);
@@ -2161,6 +2271,7 @@
       wishTimer = setTimeout(step, 1400);
     }
     function endFilm() {
+      Sound.musicStop(3); Sound.harp();
       try { VID.el.pause(); } catch (e) { }
       playing = false; idle = false; endMapMove(); setMapOpacity(0);
       trail.classList.remove('show'); findBtn.classList.remove('show');
