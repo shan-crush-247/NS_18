@@ -284,11 +284,30 @@
       // ✦ Put your photos in the 'memories' folder next to index.html, then edit the captions below
       memories: [
         { src: 'assets/her.mp4', video: true, caption: 'My favourite smile', emoji: '🌸' },
-        { src: 'memories/2.jpg', caption: 'Our silly little selfies', emoji: '📸' },
-        { src: 'memories/3.jpg', caption: 'That rainy evening', emoji: '🌧️' },
-        { src: 'memories/4.jpg', caption: 'Laughing till it hurt', emoji: '😂' },
-        { src: 'memories/5.jpg', caption: 'Endless late-night talks', emoji: '🌙' },
-        { src: 'memories/6.jpg', caption: 'And today, 27 · 11', emoji: '🎂' }
+        { src: 'memories/m01.jpg', caption: 'Where it all began 🌸', emoji: '💗' },
+        { src: 'memories/m02.jpg', caption: 'That shy little smile', emoji: '💗' },
+        { src: 'memories/m03.jpg', caption: 'Our beach day 🌊', emoji: '💗' },
+        { src: 'memories/m04.jpg', caption: 'Food, friends and you', emoji: '💗' },
+        { src: 'memories/m05.jpg', caption: 'Lazy Saturdays with you', emoji: '💗' },
+        { src: 'memories/m06.jpg', caption: 'On top of the world', emoji: '💗' },
+        { src: 'memories/m07.jpg', caption: 'Us, being silly', emoji: '💗' },
+        { src: 'memories/m08.jpg', caption: 'Pretty in pink 💗', emoji: '💗' },
+        { src: 'memories/m09.jpg', caption: 'My favourite face', emoji: '💗' },
+        { src: 'memories/m10.jpg', caption: 'Brighter than any star', emoji: '💗' },
+        { src: 'memories/m11.jpg', caption: 'The prettiest in blue 💙', emoji: '💗' },
+        { src: 'memories/m12.jpg', caption: 'That look gets me every time', emoji: '💗' },
+        { src: 'memories/m13.jpg', caption: 'Golden and glowing ✨', emoji: '💗' },
+        { src: 'memories/m14.jpg', caption: 'The smile that lights my world', emoji: '💗' },
+        { src: 'memories/m15.jpg', caption: 'My little superhero 🕷️', emoji: '💗' },
+        { src: 'memories/m16.jpg', caption: 'Saree day… my heart skipped', emoji: '💗' },
+        { src: 'memories/m17.jpg', caption: 'Dreamy you', emoji: '💗' },
+        { src: 'memories/m18.jpg', caption: 'Cutest with glasses', emoji: '💗' },
+        { src: 'memories/m19.jpg', caption: 'Simple and beautiful', emoji: '💗' },
+        { src: 'memories/m20.jpg', caption: 'Your soft smile', emoji: '💗' },
+        { src: 'memories/m21.jpg', caption: 'Warm like sunshine ☀️', emoji: '💗' },
+        { src: 'memories/m22.jpg', caption: 'Two of my favourite yous', emoji: '💗' },
+        { src: 'memories/m23.jpg', caption: 'Grace in white 🤍', emoji: '💗' },
+        { src: 'memories/m24.jpg', caption: 'And today… 27 · 11 🎂', emoji: '💗' }
       ],
       // ✦ Her real photo makes this scene look real: put 'girl.jpg' next to index.html.
       //   Optional: 'girl-closed.jpg' (same photo, eyes closed). 'heart' = where the arrow lands (fraction of the photo, x then y).
@@ -891,11 +910,11 @@
         [.9, 4.6, 'Go, little arrow… find my love ❤'],
         [STARTS[1] + .3, STARTS[1] + 3.6, 'Through infinite universes, only one heart'],
         [STARTS[1] + 4.1, STARTS[2] - .2, 'Past a billion stars…'],
-        [STARTS[2] + .6, STARTS[2] + 4.4, 'None of them shine like her ✨'],
-        [STARTS[3] + .4, STARTS[3] + 4.2, 'To the little world that holds my whole world'],
-        [STARTS[4] + .6, STARTS[4] + 3.6, 'Follow my heartbeat…'],
-        [STARTS[4] + 4.0, STARTS[4] + 6.6, 'Closer… and closer…'],
-        [STARTS[4] + 7.0, STARTS[4] + 9.3, 'Almost there, my love ❤'],
+        [STARTS[2] + .5, STARTS[2] + 3.9, 'None of them shine like her ✨'],
+        [STARTS[3] + .3, STARTS[3] + 3.9, 'To the little world that holds my whole world'],
+        [STARTS[4] + SCENES[4].dur * .06, STARTS[4] + SCENES[4].dur * .36, 'Follow my heartbeat…'],
+        [STARTS[4] + SCENES[4].dur * .4, STARTS[4] + SCENES[4].dur * .66, 'Closer… and closer…'],
+        [STARTS[4] + SCENES[4].dur * .7, STARTS[4] + SCENES[4].dur * .9, 'Almost there, my love ❤'],
         [STARTS[5] + .2, STARTS[5] + 1.9, 'There she is… my forever']
       ];
       var w = null; for (var i = 0; i < WORDS.length; i++) if (T >= WORDS[i][0] && T <= WORDS[i][1]) w = WORDS[i];
@@ -1234,6 +1253,7 @@
     function RFromZoom(z, lat) { return Math.pow(2, z) * 256 / (360 * D * Math.cos(lat * D)); }
     // te = seconds since the Earth scene began; both scenes read the same camera, so the hand-off is seamless
     function geoCam(te) {
+      te *= 5.5 / SCENES[IX.earth].dur;
       var m = Math.min(W, H), C = CONFIG.city, w = waypoints();
       var zA = zoomFromR(m * .36, 0), zB = zoomFromR(m * .62, 14), zI = Math.min(zoomFromR(m * R_INDIA, 21), 6.4);
       var k = [0, .8, 3.0, 4.6, 7.4, 8.1, 10.5, 11.3, 13.4, 14.7];
@@ -1360,7 +1380,7 @@
     function waypoints() { var C = CONFIG.city; return WP || (WP = { A: [21, 79.5], B: [11.0, 78.4], C: [C.lat, C.lon] }); }
     function mapViewAt(p) { return geoCam(mapTE0() + p * SCENES[IX.map].dur); }
     function arrowGeo(p) {
-      var w = waypoints(), te = mapTE0() + p * SCENES[IX.map].dur, k = [4.7, 5.2, 7.2, 7.9, 10.3, 14.7];
+      var w = waypoints(), te = (mapTE0() + p * SCENES[IX.map].dur) * 5.5 / SCENES[IX.earth].dur, k = [4.7, 5.2, 7.2, 7.9, 10.3, 14.7];
       return [spline(k, [w.A[0], w.A[0], w.B[0], w.B[0], w.C[0], w.C[0]], te), spline(k, [w.A[1], w.A[1], w.B[1], w.B[1], w.C[1], w.C[1]], te)];
     }
     function mercAng(a, b) { function my(l) { l *= D; return Math.log(Math.tan(PI / 4 + l / 2)); } return Math.atan2(-(my(b[0]) - my(a[0])) / D, b[1] - a[1]); }
@@ -1922,8 +1942,8 @@
     var SPR = { pink: makeSprite('255,120,200'), violet: makeSprite('170,130,255'), white: makeSprite('255,240,250'), gold: makeSprite('255,210,150') };
     var NEURO = (function () {
       var R = rng(77), n = [], c = [];
-      for (var i = 0; i < 120; i++) {
-        var x = (R() - .5) * 1500, y = (R() - .5) * 950, z = R() * 3900 - 200;
+      for (var i = 0; i < 190; i++) {
+        var x = (R() - .5) * 1500, y = (R() - .5) * 950, z = R() * (CONFIG.memories.length * 310 + 900) - 200;
         var d = Math.hypot(x / 1.3, y); if (d < 170) { var k = 170 / Math.max(d, 1); x *= k; y *= k; }
         n.push({ p: [x, y, z], s: .6 + R() * .9, col: R() < .7 ? 'pink' : 'violet' });
       }
@@ -1936,7 +1956,7 @@
       });
       return { n: n, c: c };
     })();
-    var MEMN = CONFIG.memories.map(function (m, i) { return { p: [(i % 2 ? 1 : -1) * 200, ((i % 3) - 1) * 80, 600 + i * 520] }; });
+    var MEMN = CONFIG.memories.map(function (m, i) { var a = i * 2.39996, r = 200 + (i % 3) * 30; return { p: [Math.cos(a) * r * 1.3, Math.sin(a) * r * .7, 500 + i * 310] }; });
     MEMN.forEach(function (mn) { mn.links = NEURO.n.map(function (b, j) { return { j: j, d: Math.hypot(mn.p[0] - b.p[0], mn.p[1] - b.p[1], mn.p[2] - b.p[2]) }; }).sort(function (u, v) { return u.d - v.d; }).slice(0, 4); });
     function sceneMind(ctx, p, t) {
       var last = MEMN[MEMN.length - 1].p[2], camz = lerp(-350, last - 240, ease(p) * .25 + p * .75);
@@ -2007,13 +2027,13 @@
 
     /* ================= FILM ENGINE ================= */
     var SCENES = [
-      { dur: 6.5, draw: sceneMultiverse },
-      { dur: 7.5, draw: sceneGalaxies },
-      { dur: 6, draw: sceneSolar },
-      { dur: 5.5, draw: sceneEarth },
-      { dur: 10, draw: sceneMap },
+      { dur: 5.6, draw: sceneMultiverse },
+      { dur: 6.3, draw: sceneGalaxies },
+      { dur: 5.1, draw: sceneSolar },
+      { dur: 4.8, draw: sceneEarth },
+      { dur: 8.7, draw: sceneMap },
       { dur: 8.5, draw: sceneGirl },
-      { dur: 12, draw: sceneMind }
+      { dur: 19, draw: sceneMind }
     ];
     var MAPI = 4, IX = { solar: 2, earth: 3, map: 4, girl: 5, mem: 6 };
     var CHAPTERS = [
