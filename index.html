@@ -123,7 +123,7 @@
 
     #mapLayer { position: fixed; inset: 0; z-index: 9; opacity: 0; pointer-events: none; background: #0b1020; filter: saturate(1.1) contrast(1.06) brightness(.92); }
     #mapLayer.leaflet-container { background: #0b1020; }
-    .findme { position: absolute; z-index: 18; left: 50%; bottom: calc(var(--bar) + 13vh); transform: translate(-50%, 12px); display: inline-flex; align-items: center; gap: 12px; padding: 16px 32px; border-radius: 999px; border: 1px solid rgba(255,255,255,.3);
+    .findme { position: absolute; z-index: 18; left: 50%; bottom: calc(var(--bar) + 16px); transform: translate(-50%, 12px); display: inline-flex; align-items: center; gap: 12px; padding: 16px 32px; border-radius: 999px; border: 1px solid rgba(255,255,255,.3);
       background: linear-gradient(120deg, rgba(242,164,199,.3), rgba(187,168,250,.22)); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); color: #fff; font-size: 15px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; cursor: pointer;
       box-shadow: 0 0 50px rgba(242,164,199,.35); opacity: 0; visibility: hidden; transition: opacity .7s, transform .7s, visibility .7s; }
     .findme.show { opacity: 1; visibility: visible; transform: translate(-50%, 0); animation: pulse-btn 1.8s infinite; }
@@ -239,7 +239,7 @@
   <section class="journey" id="journey" aria-label="An animated journey">
     <canvas id="film"></canvas>
     <div class="trail" id="trail" aria-hidden="true"><span>Multiverse</span><i>›</i><span>Universe</span><i>›</i><span>Milky Way</span><i>›</i><span>Solar System</span><i>›</i><span>Earth</span><i>›</i><span>India</span><i>›</i><span>Tamil Nadu</span><i>›</i><span>Karur</span><i>›</i><span>❤ You</span></div>
-    <button class="findme" id="findMe" type="button"><span class="h">❤</span>Find me</button>
+    <button class="findme" id="findMe" type="button"><span class="h">❤</span>Ready</button>
     <div class="map-attrib" id="mapAttrib">Map: Leaflet · Imagery © Esri, Maxar, Earthstar Geographics</div>
     <div class="cine-vignette" aria-hidden="true"></div>
     <div class="cine-leak" id="leak" aria-hidden="true"></div>
@@ -309,6 +309,8 @@
         ],
         sign: 'Forever yours'
       },
+      // ✦ The WhatsApp message shown on her reel while she reads her phone
+      whatsapp: { name: 'My love ❤', text: 'Hi babe 💕 look up… my arrow is coming for you' },
       sender: 'Someone special',
       notifTitle: '💌 You have a special message',
       notifBody: 'Someone sent you a little surprise…',
@@ -827,10 +829,97 @@
       drawSky(ctx, cam, 1, gt);
       drawGalaxies(ctx, GAL, cam, gt, 1);
     }
+    var LAST_ARROW = null;
+    // an original chibi Cupid: curly gold hair, rosy cheeks, fluttering wings, golden bow
+    function drawCupid(ctx, B, dir, pull, t, alpha) {
+      if (alpha <= 0) return;
+      var s = Math.min(W, H) / 760 * .8, px = -dir[1], py = dir[0];
+      var G = [B[0] - dir[0] * 52 * s, B[1] - dir[1] * 52 * s];
+      var S = [B[0] - dir[0] * (92 + pull * 34) * s, B[1] - dir[1] * (92 + pull * 34) * s];
+      var Hd = [S[0] - 26 * s, S[1] + 6 * s], C = [Hd[0] + 4 * s, Hd[1] + 54 * s], fl = Math.sin(t * 9) * .3;
+      ctx.save(); ctx.globalAlpha = alpha; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.save(); ctx.globalCompositeOperation = 'lighter'; glow(ctx, C[0], C[1] - 20 * s, 150 * s, 'rgba(255,170,215,A)', .35); ctx.restore();
+      // wings
+      [-1, 1].forEach(function (sd) {
+        ctx.save(); ctx.translate(C[0] + sd * 14 * s, C[1] - 18 * s); ctx.rotate(sd * (-.5 + fl));
+        for (var k = 0; k < 3; k++) {
+          ctx.fillStyle = k === 0 ? '#ffffff' : k === 1 ? '#fde8f2' : '#f8d3e6';
+          ctx.beginPath(); ctx.ellipse(sd * (22 + k * 8) * s, (-8 + k * 9) * s, (30 - k * 5) * s, (14 - k * 2) * s, sd * (.5 + k * .25), 0, TAU); ctx.fill();
+        }
+        ctx.restore();
+      });
+      // legs
+      ctx.fillStyle = '#ffd6c0';
+      ctx.beginPath(); ctx.ellipse(C[0] - 10 * s, C[1] + 30 * s, 9 * s, 13 * s, .3, 0, TAU); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(C[0] + 12 * s, C[1] + 28 * s, 9 * s, 13 * s, -.5, 0, TAU); ctx.fill();
+      // body + sash
+      var bg = ctx.createRadialGradient(C[0] - 8 * s, C[1] - 10 * s, 2, C[0], C[1], 30 * s); bg.addColorStop(0, '#ffe9dc'); bg.addColorStop(1, '#f7bfa6');
+      ctx.fillStyle = bg; ctx.beginPath(); ctx.ellipse(C[0], C[1], 23 * s, 27 * s, 0, 0, TAU); ctx.fill();
+      ctx.save(); ctx.beginPath(); ctx.ellipse(C[0], C[1], 23 * s, 27 * s, 0, 0, TAU); ctx.clip();
+      ctx.strokeStyle = '#ff6fa8'; ctx.lineWidth = 9 * s; ctx.beginPath(); ctx.moveTo(C[0] - 26 * s, C[1] - 20 * s); ctx.lineTo(C[0] + 26 * s, C[1] + 22 * s); ctx.stroke();
+      ctx.fillStyle = '#ff6fa8'; ctx.fillRect(C[0] - 24 * s, C[1] + 10 * s, 48 * s, 18 * s); ctx.restore();
+      // back (drawing) arm to the string
+      ctx.strokeStyle = '#f9c9b1'; ctx.lineWidth = 9 * s; ctx.beginPath(); ctx.moveTo(C[0] - 6 * s, C[1] - 16 * s); ctx.lineTo(S[0], S[1]); ctx.stroke();
+      // head
+      var hg = ctx.createRadialGradient(Hd[0] - 8 * s, Hd[1] - 8 * s, 2, Hd[0], Hd[1], 28 * s); hg.addColorStop(0, '#fff0e6'); hg.addColorStop(1, '#f7c2a8');
+      ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(Hd[0], Hd[1], 25 * s, 0, TAU); ctx.fill();
+      ctx.fillStyle = '#f2c14e';
+      [[-16, -16, 10], [-4, -22, 11], [9, -20, 10], [19, -10, 8], [-22, -4, 8], [2, -12, 6]].forEach(function (c) { ctx.beginPath(); ctx.arc(Hd[0] + c[0] * s, Hd[1] + c[1] * s, c[2] * s, 0, TAU); ctx.fill(); });
+      ctx.fillStyle = 'rgba(255,255,255,.45)'; ctx.beginPath(); ctx.arc(Hd[0] - 6 * s, Hd[1] - 24 * s, 3 * s, 0, TAU); ctx.fill();
+      glow(ctx, Hd[0] - 11 * s, Hd[1] + 9 * s, 8 * s, 'rgba(255,110,150,A)', .7); glow(ctx, Hd[0] + 13 * s, Hd[1] + 9 * s, 8 * s, 'rgba(255,110,150,A)', .7);
+      ctx.strokeStyle = '#5a3424'; ctx.lineWidth = 2.2 * s;
+      var wink = pull > .5;
+      ctx.beginPath(); ctx.arc(Hd[0] - 8 * s, Hd[1] + 2 * s, 4 * s, PI * 1.1, PI * 1.9); ctx.stroke();
+      if (wink) { ctx.beginPath(); ctx.moveTo(Hd[0] + 6 * s, Hd[1]); ctx.lineTo(Hd[0] + 13 * s, Hd[1]); ctx.stroke(); }
+      else { ctx.beginPath(); ctx.arc(Hd[0] + 9 * s, Hd[1] + 2 * s, 4 * s, PI * 1.1, PI * 1.9); ctx.stroke(); }
+      ctx.beginPath(); ctx.arc(Hd[0] + 1 * s, Hd[1] + 9 * s, 5 * s, PI * .15, PI * .85); ctx.stroke();
+      // bow (golden) + string
+      var t1 = [G[0] + px * 62 * s - dir[0] * 10 * s, G[1] + py * 62 * s - dir[1] * 10 * s], t2 = [G[0] - px * 62 * s - dir[0] * 10 * s, G[1] - py * 62 * s - dir[1] * 10 * s];
+      var cb = [G[0] + dir[0] * 34 * s, G[1] + dir[1] * 34 * s];
+      ctx.strokeStyle = '#c8932f'; ctx.lineWidth = 7 * s; ctx.beginPath(); ctx.moveTo(t1[0], t1[1]); ctx.quadraticCurveTo(cb[0], cb[1], t2[0], t2[1]); ctx.stroke();
+      ctx.strokeStyle = '#ffe3a1'; ctx.lineWidth = 2.5 * s; ctx.stroke();
+      ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 1.3 * s; ctx.beginPath(); ctx.moveTo(t1[0], t1[1]); ctx.lineTo(S[0], S[1]); ctx.lineTo(t2[0], t2[1]); ctx.stroke();
+      ctx.fillStyle = '#ff6fa8'; ctx.beginPath(); ctx.arc(G[0], G[1], 5 * s, 0, TAU); ctx.fill();
+      // front arm holding the bow
+      ctx.strokeStyle = '#f9c9b1'; ctx.lineWidth = 9 * s; ctx.beginPath(); ctx.moveTo(C[0] + 12 * s, C[1] - 16 * s); ctx.lineTo(G[0], G[1]); ctx.stroke();
+      ctx.restore();
+    }
+    function cupidAim(tgx, tgy) { var B = leadPos(0), d = norm([tgx - B[0], tgy - B[1], 0]); return { B: B, dir: [d[0], d[1]] }; }
+    var WORDS = null;
+    function arrowWords(T) {
+      if (!WORDS) WORDS = [
+        [.9, 4.6, 'Go, little arrow… find my love ❤'],
+        [STARTS[1] + .3, STARTS[1] + 3.6, 'Through infinite universes, only one heart'],
+        [STARTS[1] + 4.1, STARTS[2] - .2, 'Past a billion stars…'],
+        [STARTS[2] + .6, STARTS[2] + 4.4, 'None of them shine like her ✨'],
+        [STARTS[3] + .4, STARTS[3] + 4.2, 'To the little world that holds my whole world'],
+        [STARTS[4] + .6, STARTS[4] + 3.6, 'Follow my heartbeat…'],
+        [STARTS[4] + 4.0, STARTS[4] + 6.6, 'Closer… and closer…'],
+        [STARTS[4] + 7.0, STARTS[4] + 9.3, 'Almost there, my love ❤'],
+        [STARTS[5] + .2, STARTS[5] + 1.9, 'There she is… my forever']
+      ];
+      var w = null; for (var i = 0; i < WORDS.length; i++) if (T >= WORDS[i][0] && T <= WORDS[i][1]) w = WORDS[i];
+      if (!w || !LAST_ARROW) return;
+      var a = clamp((T - w[0]) / .45) * clamp((w[1] - T) / .45);
+      var fs4 = Math.round(clamp(Math.min(W, H) * .045, 22, 38));
+      fctx.save(); fctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      fctx.font = '600 ' + fs4 + 'px Caveat, "Segoe Script", cursive'; var tw = fctx.measureText(w[2]).width;
+      var x = clamp(LAST_ARROW.x, tw / 2 + 16, W - tw / 2 - 16), y = clamp(LAST_ARROW.y - fs4 * 2.2 - (1 - a) * 10, BAR + 120, H - BAR - 70);
+      fctx.globalAlpha = a; fctx.textAlign = 'center'; fctx.textBaseline = 'middle';
+      fctx.shadowColor = 'rgba(255,80,160,.95)'; fctx.shadowBlur = 18; fctx.fillStyle = '#fff4fa'; fctx.fillText(w[2], x, y);
+      fctx.restore();
+    }
     function mvDrift(t) { return [Math.sin(t * .13) * 260, Math.sin(t * .09) * 140]; }
     function sceneIdle(ctx, t) {
       var d = mvDrift(t), tg = mvDraw(ctx, d[0], d[1], -300 + Math.sin(t * .07) * 120, t, 0);
       if (tg) { var pu = .5 + .5 * Math.sin(t * 2.2); ctx.save(); ctx.globalCompositeOperation = 'lighter'; glow(ctx, tg.x, tg.y, tg.r * (2.1 + .25 * pu), 'rgba(255,140,200,A)', .12 + .1 * pu); ctx.restore(); }
+      var aim = cupidAim(tg ? tg.x : W / 2, tg ? tg.y : H * .3), bob = Math.sin(t * 2) * 6, B = [aim.B[0], aim.B[1] + bob], pull = .15 + .05 * Math.sin(t * 3);
+      var sc = Math.min(W, H) / 820, ap = [B[0] - aim.dir[0] * pull * 34 * Math.min(W, H) / 760 * .8, B[1] - aim.dir[1] * pull * 34 * Math.min(W, H) / 760 * .8];
+      drawCupid(ctx, B, aim.dir, pull, t, clamp(t / .8));
+      drawLoveArrow(ctx, ap[0], ap[1], Math.atan2(aim.dir[1], aim.dir[0]), sc, t, clamp(t / .8));
+      var ia = clamp((t - 1) / .8);
+      if (ia > 0) { ctx.save(); ctx.globalAlpha = ia; var fs5 = Math.round(clamp(Math.min(W, H) * .05, 24, 40)); ctx.font = '600 ' + fs5 + 'px Caveat, "Segoe Script", cursive'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.shadowColor = 'rgba(255,80,160,.95)'; ctx.shadowBlur = 18; ctx.fillStyle = '#fff4fa';
+        ctx.fillText('Cupid is ready to find the one I love…', W / 2, BAR + 70); ctx.font = '500 ' + Math.round(fs5 * .5) + 'px ' + FONT; ctx.shadowBlur = 8; ctx.fillText('tap Ready when your heart is ❤', W / 2, BAR + 70 + fs5 * .95); ctx.restore(); }
     }
     function sceneMultiverse(ctx, p, t) {
       var k0 = 1 - smooth(seg(p, 0, .35)), cz = lerp(-300, MV_T.p[2] - 60, Math.pow(ease(seg(p, .05, 1)), 1.6));
@@ -845,7 +934,21 @@
           ctx.globalAlpha = ba; var ty = Math.max(BAR + 76, tg.y - bs / 2 - 34);
           hudText(ctx, tg.x, ty, 'OUR UNIVERSE', 14, '#ffd2e6', 'center', 800); hudText(ctx, tg.x, ty + 19, 'the one where you exist', 11, '#ffe9f3', 'center', 500); ctx.globalAlpha = 1;
         }
-        arrowLead(ctx, tg.x, tg.y, t, 1);
+        var rel = .45;
+        if (GT < 2.4) {
+          var aim = cupidAim(tg.x, tg.y), m7 = Math.min(W, H) / 760 * .8;
+          var pull = GT < rel ? lerp(.2, 1, ease(GT / rel)) : Math.max(0, Math.sin((GT - rel) * 40) * .25 * Math.exp(-(GT - rel) * 6));
+          var cy0 = (GT > 1.1 ? Math.pow(GT - 1.1, 2) * 120 : 0);
+          drawCupid(ctx, [aim.B[0] - (GT > 1.1 ? (GT - 1.1) * 60 : 0), aim.B[1] + cy0], aim.dir, pull, t + IDLE_T, 1 - seg(GT, 1.1, 2.3));
+        }
+        if (GT < rel) {
+          var ap = [aim.B[0] - aim.dir[0] * pull * 34 * m7, aim.B[1] - aim.dir[1] * pull * 34 * m7];
+          drawLoveArrow(ctx, ap[0], ap[1], Math.atan2(aim.dir[1], aim.dir[0]), Math.min(W, H) / 820, GT, 1);
+        } else if (GT < 1.3) {
+          var aim2 = cupidAim(tg.x, tg.y), l2 = leadPos(GT), q2 = (GT - rel) / (1.3 - rel), surge = Math.sin(q2 * PI) * 70 * Math.min(W, H) / 760;
+          var a2 = lerpAng(Math.atan2(aim2.dir[1], aim2.dir[0]), Math.atan2(tg.y - l2[1], tg.x - l2[0]), smooth(q2));
+          drawLoveArrow(ctx, lerp(aim2.B[0], l2[0], smooth(q2)) + Math.cos(a2) * surge, lerp(aim2.B[1], l2[1], smooth(q2)) + Math.sin(a2) * surge, a2, Math.min(W, H) / 820, GT, 1);
+        } else arrowLead(ctx, tg.x, tg.y, t, 1);
         var mem = seg(p, .8, 1);
         if (mem > 0) {
           ctx.save(); ctx.globalCompositeOperation = 'lighter';
@@ -1182,6 +1285,7 @@
     }
     function drawLoveArrow(ctx, x, y, ang, sc, t, alpha) {
       if (alpha <= 0 || sc <= 0) return;
+      if (alpha > .3) { if (!LAST_ARROW) LAST_ARROW = { x: x, y: y }; else { LAST_ARROW.x += (x - LAST_ARROW.x) * .18; LAST_ARROW.y += (y - LAST_ARROW.y) * .18; } }
       ctx.save(); ctx.globalAlpha = alpha; ctx.translate(x, y); ctx.rotate(ang); ctx.scale(sc, sc);
       ctx.save(); ctx.globalCompositeOperation = 'lighter';
       for (var i = 1; i <= 14; i++) {
@@ -1206,7 +1310,7 @@
       ctx.restore();
     }
     var GT = 0;
-    function leadPos(t) { return [W * .5 + Math.sin(t * .9) * W * .035, H - BAR - Math.min(H * .2, 170) + Math.sin(t * 1.7) * 6]; }
+    function leadPos(t) { return [W * .5 + Math.sin(t * .9) * W * .035, H - BAR - Math.min(H * .36, 280) + Math.sin(t * 1.7) * 6]; }
     function arrowLead(ctx, tx, ty, t, alpha, scMul) {
       var l = leadPos(GT);
       drawLoveArrow(ctx, l[0], l[1], Math.atan2(ty - l[1], tx - l[0]), Math.min(W, H) / 820 * (scMul === undefined ? 1 : scMul), GT, alpha);
@@ -1471,6 +1575,23 @@
       try { ctx.drawImage(el, sx, sy, sw, sh, dx, dy, dw, dh); } catch (e) { }
       var gr = ctx.createLinearGradient(0, dy + dh * .62, 0, dy + dh); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(20,0,20,.55)'); ctx.fillStyle = gr; ctx.fillRect(dx, dy, dw, dh);
       // reel chrome: progress line, like button, caption
+      var wa = clamp(t / .35) * (1 - clamp((t - 2.5) / .4)) * (1 - grow);
+      if (wa > 0 && CONFIG.whatsapp) {
+        var wy = dy + 26 - (1 - clamp(t / .35)) * 40, wx = dx + 12, ww = dw - 24, wh = 62;
+        ctx.save(); ctx.globalAlpha = wa;
+        ctx.shadowColor = 'rgba(0,0,0,.35)'; ctx.shadowBlur = 18; rr(ctx, wx, wy, ww, wh, 16); ctx.fillStyle = 'rgba(250,248,250,.94)'; ctx.fill(); ctx.shadowBlur = 0;
+        ctx.fillStyle = '#25D366'; rr(ctx, wx + 10, wy + 13, 36, 36, 9); ctx.fill();
+        ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.4; ctx.beginPath(); ctx.arc(wx + 28, wy + 30, 10, 0, TAU); ctx.stroke();
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.moveTo(wx + 19, wy + 40); ctx.lineTo(wx + 17, wy + 45); ctx.lineTo(wx + 23, wy + 42); ctx.fill();
+        ctx.fillStyle = '#111'; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.font = '700 13px ' + FONT;
+        ctx.fillText('WhatsApp · ' + CONFIG.whatsapp.name, wx + 56, wy + 26);
+        ctx.fillStyle = '#8a8a8a'; ctx.font = '500 11px ' + FONT; ctx.textAlign = 'right'; ctx.fillText('now', wx + ww - 12, wy + 26);
+        ctx.textAlign = 'left'; ctx.fillStyle = '#333'; ctx.font = '500 13px ' + FONT;
+        var msg = CONFIG.whatsapp.text, maxw = ww - 68; while (msg.length > 4 && ctx.measureText(msg).width > maxw) msg = msg.slice(0, -2);
+        if (msg !== CONFIG.whatsapp.text) msg = msg.replace(/\s*\S?$/, '') + '…';
+        ctx.fillText(msg, wx + 56, wy + 46);
+        ctx.restore();
+      }
       var ui = 1 - grow;
       if (ui > .02) {
         ctx.globalAlpha = ui;
@@ -1908,7 +2029,7 @@
     (function () { var acc = 0; SCENES.forEach(function (s) { STARTS.push(acc); acc += s.dur - OVER; }); TOTAL = STARTS[STARTS.length - 1] + SCENES[SCENES.length - 1].dur; })();
     var CRUMBS = [0, STARTS[1], STARTS[1] + SCENES[1].dur * .42, STARTS[2], STARTS[2] + SCENES[2].dur * .45, STARTS[3] + SCENES[3].dur * .6, STARTS[4] + SCENES[4].dur * .22, STARTS[4] + SCENES[4].dur * .5, STARTS[5] + .5];
     var EVENTS = [
-      { at: STARTS[1] - .5, fn: 'boom' }, { at: STARTS[2] - .4, fn: 'whoosh' }, { at: STARTS[3] - .3, fn: 'whoosh' }, { at: STARTS[4] - .2, fn: 'whoosh' }, { at: STARTS[5] - .3, fn: 'whoosh' },
+      { at: .45, fn: 'whoosh' }, { at: STARTS[1] - .5, fn: 'boom' }, { at: STARTS[2] - .4, fn: 'whoosh' }, { at: STARTS[3] - .3, fn: 'whoosh' }, { at: STARTS[4] - .2, fn: 'whoosh' }, { at: STARTS[5] - .3, fn: 'whoosh' },
       { at: STARTS[5] + 2.0, fn: 'heart' }, { at: STARTS[6] + .2, fn: 'whoosh' }
     ];
     var filmT = 0, playing = false, idle = false, idleT = 0, lastNow = 0, fired = {}, capIdx = -1, crumbIdx = -1;
@@ -1955,6 +2076,7 @@
       if (show !== capIdx) { capIdx = show; if (!quiet) setChapter(show); }
       setCrumb(T);
       progressBar.style.width = (clamp(T / TOTAL) * 100) + '%';
+      arrowWords(T);
     }
     function filmFrame(now) {
       if (!playing) return;
@@ -1979,7 +2101,6 @@
       setTimeout(function () {
         if (!idle) return;
         findBtn.classList.add('show');
-        subtitle.textContent = 'Across infinite universes, there is only one heart I would cross them all for…'; subtitle.classList.add('show');
       }, 1300);
       lastNow = performance.now(); requestAnimationFrame(idleFrame);
       Sound.fadeTo(.5, 2);
@@ -1989,7 +2110,7 @@
       idle = false; findBtn.classList.remove('show'); subtitle.classList.remove('show');
       IDLE_T = idleT; MV_D0 = mvDrift(idleT);
       try { var vp2 = VID.el.play(); if (vp2 && vp2.then) vp2.then(function () { VID.el.pause(); VID.el.currentTime = 0; }, function () { }); } catch (e) { }
-      Sound.chime(); Sound.whoosh();
+      Sound.chime();
       startFilm();
     });
     function startFilm() {
